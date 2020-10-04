@@ -51,7 +51,17 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
             return $this->printResult($api, $update, $game);
         }
 
-        $this->playerTurn($update, $game);
+        try {
+            $this->playerTurn($update, $game);
+        } catch (\Throwable $throwable) {
+            $api->sendMessage(
+                $update->getMessage()->getChat()->getId(),
+                $throwable->getMessage(),
+                'HTML'
+            );
+
+            return null;
+        }
         $this->gameManager->saveGame($update, $game);
 
         if ($game->isOver()) {
@@ -73,7 +83,7 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
      */
     public function getDescription()
     {
-        return 'Сделать ход. Например /goA1';
+        return 'Сделать ход. Например /go a1';
     }
 
     private function parseCoordinates(string $text): array
@@ -83,6 +93,10 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
         $strCoords = preg_replace('/\/go\s+/', '', $text);
         $strCoords = strtolower($strCoords);
         $coords = str_split($strCoords, 1);
+        if (!$this->validateCoords($coords)) {
+            throw new \RuntimeException('Неправильные координаты');
+        }
+
         $coords[0] = $map[$coords[0]];
         $coords[1] = intval($coords[1]) - 1;
 
@@ -112,5 +126,13 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
     private function playerTurn(Update $update, Game $game): void
     {
         $game->go('x', $this->parseCoordinates($update->getMessage()->getText()));
+    }
+
+    private function validateCoords(array $coords): bool
+    {
+        return
+            preg_match('/^[abc]$/', $coords[0]) !== false
+            &&
+            preg_match('/^[123]$/', $coords[1]) !== false;
     }
 }

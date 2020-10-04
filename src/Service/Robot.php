@@ -10,7 +10,7 @@ class Robot
     {
         $availableCoords = $game->getEmptyCells();
 
-        $i = rand(0, count($availableCoords));
+        $i = rand(0, count($availableCoords) - 1);
 
         return $availableCoords[$i] ?? null;
     }

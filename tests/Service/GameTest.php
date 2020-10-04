@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Service;
 
+use App\Service\Game;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -13,9 +14,81 @@ class GameTest extends TestCase
 {
     /**
      * @covers ::playerHasLine
+     * @@dataProvider dataPlayerHasLine
      */
-    public function testPlayerHasLine()
+    public function testPlayerHasLine(array $field, $expected)
     {
-        self::assertTrue(true);
+        $game = new Game($field);
+        self::assertEquals($expected,$game->playerHasLine('x'));
+    }
+
+    public function dataPlayerHasLine()
+    {
+        return [
+            [
+                'field' => [
+                    ['x', 'x', 'x'],
+                    [' ', ' ', ' '],
+                    [' ', ' ', ' '],
+                ],
+                true
+            ],
+            [
+                'field' => [
+                    [' ', ' ', ' '],
+                    ['x', 'x', 'x'],
+                    [' ', ' ', ' '],
+                ],
+                true
+            ],
+            [
+                'field' => [
+                    [' ', ' ', ' '],
+                    [' ', ' ', ' '],
+                    ['x', 'x', 'x'],
+                ],
+                true
+            ],
+            [
+                'field' => [
+                    ['x', 'x', 'o'],
+                    [' ', ' ', ' '],
+                    [' ', ' ', ' '],
+                ],
+                false
+            ],
+            [
+                'field' => [
+                    ['x', 'x', 'o'],
+                    ['x', ' ', ' '],
+                    ['x', ' ', ' '],
+                ],
+                true
+            ],
+            [
+                'field' => [
+                    ['x', 'x', 'o'],
+                    ['x', 'x', ' '],
+                    [' ', 'x', ' '],
+                ],
+                true
+            ],
+            [
+                'field' => [
+                    ['x', 'o', 'x'],
+                    [' ', ' ', 'x'],
+                    ['x', ' ', 'x'],
+                ],
+                true
+            ],
+            [
+                'field' => [
+                    ['x', 'o', 'x'],
+                    [' ', 'x', ' '],
+                    ['x', ' ', 'x'],
+                ],
+                true
+            ],
+        ];
     }
 }
