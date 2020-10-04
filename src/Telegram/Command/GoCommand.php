@@ -10,8 +10,10 @@ use App\Service\Printer;
 use App\Service\Robot;
 use BoShurik\TelegramBotBundle\Telegram\Command\AbstractCommand;
 use BoShurik\TelegramBotBundle\Telegram\Command\PublicCommandInterface;
+use RuntimeException;
 use TelegramBot\Api\BotApi;
 use TelegramBot\Api\Types\Update;
+use Throwable;
 
 class GoCommand extends AbstractCommand implements PublicCommandInterface
 {
@@ -53,7 +55,7 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
 
         try {
             $this->playerTurn($update, $game);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $api->sendMessage(
                 $update->getMessage()->getChat()->getId(),
                 $throwable->getMessage(),
@@ -94,7 +96,7 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
         $strCoords = strtolower($strCoords);
         $coords = str_split($strCoords, 1);
         if (!$this->validateCoords($coords)) {
-            throw new \RuntimeException('Неправильные координаты');
+            throw new RuntimeException('Неправильные координаты');
         }
 
         $coords[0] = $map[$coords[0]];
@@ -125,7 +127,12 @@ class GoCommand extends AbstractCommand implements PublicCommandInterface
 
     private function playerTurn(Update $update, Game $game): void
     {
-        $game->go('x', $this->parseCoordinates($update->getMessage()->getText()));
+        $coords = $this->parseCoordinates($update->getMessage()->getText());
+        if (' ' !== $game->getField()[$coords[1]][$coords[0]]) {
+            throw new RuntimeException('Ячейка уже занята');
+        }
+
+        $game->go('x', $coords);
     }
 
     private function validateCoords(array $coords): bool
