@@ -99,7 +99,7 @@ class Game
         return false;
     }
 
-    private function countHorizontalPlayerCells(string $player, array $startCell): int
+    public function countHorizontalPlayerCells(string $player, array $startCell): int
     {
         $value = $this->field[$startCell[1]][$startCell[0]] ?? null;
         if ($value !== $player) {
@@ -109,7 +109,7 @@ class Game
         return 1 + $this->countHorizontalPlayerCells($player, [$startCell[0] + 1, $startCell[1]]);
     }
 
-    private function countVerticalPlayerCells(string $player, array $startCell): int
+    public function countVerticalPlayerCells(string $player, array $startCell): int
     {
         $value = $this->field[$startCell[1]][$startCell[0]] ?? null;
         if ($value !== $player) {
@@ -119,17 +119,17 @@ class Game
         return 1 + $this->countVerticalPlayerCells($player, [$startCell[0], $startCell[1] + 1]);
     }
 
-    private function countLeftDownDiagonalPlayerCells(string $player, array $startCell): int
+    public function countLeftDownDiagonalPlayerCells(string $player, array $startCell): int
     {
         $value = $this->field[$startCell[1]][$startCell[0]] ?? null;
         if ($value !== $player) {
             return 0;
         }
 
-        return 1 + $this->countLeftDownDiagonalPlayerCells($player, [$startCell[0] - 1, $startCell[1] - 1]);
+        return 1 + $this->countLeftDownDiagonalPlayerCells($player, [$startCell[0] - 1, $startCell[1] + 1]);
     }
 
-    private function countRightDownDiagonalPlayerCells(string $player, array $startCell): int
+    public function countRightDownDiagonalPlayerCells(string $player, array $startCell): int
     {
         $value = $this->field[$startCell[1]][$startCell[0]] ?? null;
         if ($value !== $player) {
